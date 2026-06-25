@@ -1,0 +1,1 @@
+"""Background scrape execution worker."""

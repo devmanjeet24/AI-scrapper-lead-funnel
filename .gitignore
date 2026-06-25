@@ -1,0 +1,93 @@
+# =========================
+# Environment & secrets
+# =========================
+# Never commit real credentials (Neon, OpenAI, API keys)
+.env
+.env.*
+!.env.example
+
+# =========================
+# Backend (Python / UV / FastAPI)
+# backend/
+# =========================
+backend/.venv/
+backend/.env
+backend/.env.*
+!backend/.env.example
+
+# Python bytecode & caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Test / coverage / type-check caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.hypothesis/
+
+# Virtual environments (any location)
+.venv/
+venv/
+env/
+
+# Alembic local overrides (if you add them later)
+backend/alembic.ini.local
+
+# =========================
+# Frontend (React / Node)
+# frontend/  — add when you create React app
+# =========================
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# Logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# Vite
+frontend/.vite/
+
+# =========================
+# IDE & editor
+# =========================
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+*.swp
+*.swo
+*~
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Logs & runtime
+# =========================
+*.log
+logs/
+
+# =========================
+# Docker / local infra (optional, for later)
+# =========================
+docker-compose.override.yml
+
+# =========================
+# Playwright (scraper milestone, later)
+# =========================
+playwright-report/
+test-results/
+.blob_storage/
