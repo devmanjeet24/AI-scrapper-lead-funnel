@@ -1,4 +1,12 @@
+from app.models.creative_asset import CreativeAsset
+from app.models.creative_set import CreativeSet
+from app.models.deployment_package import DeploymentPackage
 from app.models.enums import (
+    CreativeAssetStatus,
+    CreativeAssetType,
+    CreativeSetStatus,
+    DeploymentPackageStatus,
+    LeadStatus,
     ScrapeJobStatus,
     ScrapeResultStatus,
     ScrapeSourceType,
@@ -6,6 +14,7 @@ from app.models.enums import (
     SignalStatus,
     SignalType,
 )
+from app.models.lead import Lead
 from app.models.organization import Organization
 from app.models.scrape_job import ScrapeJob
 from app.models.scrape_result import ScrapeResult
@@ -18,10 +27,19 @@ __all__ = [
     "ScrapeJob",
     "ScrapeResult",
     "Signal",
+    "Lead",
+    "CreativeSet",
+    "CreativeAsset",
+    "DeploymentPackage",
     "ScrapeSourceType",
     "ScrapeJobStatus",
     "ScrapeResultStatus",
     "SignalType",
     "SignalStatus",
     "SignalPriority",
+    "LeadStatus",
+    "CreativeSetStatus",
+    "CreativeAssetType",
+    "CreativeAssetStatus",
+    "DeploymentPackageStatus",
 ]

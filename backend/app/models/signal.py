@@ -13,6 +13,8 @@ from app.models.enums import ScrapeSourceType, SignalPriority, SignalStatus, Sig
 from app.models.mixins import TimestampMixin, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
+    from app.models.creative_set import CreativeSet
+    from app.models.lead import Lead
     from app.models.organization import Organization
     from app.models.scrape_job import ScrapeJob
     from app.models.scrape_result import ScrapeResult
@@ -93,3 +95,5 @@ class Signal(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     scrape_job: Mapped[ScrapeJob] = relationship(back_populates="signals")
     scrape_result: Mapped[ScrapeResult] = relationship(back_populates="signals")
     reviewed_by: Mapped[User | None] = relationship(back_populates="reviewed_signals")
+    lead: Mapped[Lead | None] = relationship(back_populates="signal", uselist=False)
+    creative_sets: Mapped[list[CreativeSet]] = relationship(back_populates="signal")

@@ -13,6 +13,8 @@ from app.models.enums import ScrapeJobStatus, ScrapeSourceType
 from app.models.mixins import TimestampMixin, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
+    from app.models.creative_set import CreativeSet
+    from app.models.lead import Lead
     from app.models.organization import Organization
     from app.models.scrape_result import ScrapeResult
     from app.models.signal import Signal
@@ -61,3 +63,5 @@ class ScrapeJob(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         cascade="all, delete-orphan",
     )
     signals: Mapped[list[Signal]] = relationship(back_populates="scrape_job")
+    leads: Mapped[list[Lead]] = relationship(back_populates="scrape_job")
+    creative_sets: Mapped[list[CreativeSet]] = relationship(back_populates="scrape_job")

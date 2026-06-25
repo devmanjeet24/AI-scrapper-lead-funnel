@@ -7,6 +7,12 @@ from pydantic import BaseModel, ConfigDict, Field
 from app.models.enums import ScrapeSourceType, SignalPriority, SignalStatus, SignalType
 
 
+class SignalUpdate(BaseModel):
+    status: SignalStatus | None = None
+    priority: SignalPriority | None = None
+    dismissed_reason: str | None = Field(default=None, max_length=500)
+
+
 class SignalResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

@@ -4,18 +4,21 @@ import asyncio
 import json
 import logging
 import time
-from typing import Any
+from typing import Any, TypeVar
 
 from groq import APIConnectionError, APIStatusError, AsyncGroq, AuthenticationError, RateLimitError
+from pydantic import BaseModel
 
 from app.ai.errors import LLMAuthError, LLMRateLimitError, LLMServiceError, LLMValidationError
 from app.ai.rate_limiter import RateLimiter
-from app.ai.schemas import LLMUsage, PageAnalysisResult
+from app.ai.schemas import LLMUsage
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
 _rate_limiter = RateLimiter(settings.groq_max_requests_per_minute)
+
+T = TypeVar("T", bound=BaseModel)
 
 
 class GroqClient:
@@ -34,8 +37,8 @@ class GroqClient:
         *,
         system_prompt: str,
         user_prompt: str,
-        response_model: type[PageAnalysisResult],
-    ) -> tuple[PageAnalysisResult, LLMUsage]:
+        response_model: type[T],
+    ) -> tuple[T, LLMUsage]:
         last_error: Exception | None = None
 
         for attempt in range(settings.groq_max_retries + 1):
@@ -56,8 +59,8 @@ class GroqClient:
         self,
         system_prompt: str,
         user_prompt: str,
-        response_model: type[PageAnalysisResult],
-    ) -> tuple[PageAnalysisResult, LLMUsage]:
+        response_model: type[T],
+    ) -> tuple[T, LLMUsage]:
         started = time.perf_counter()
         try:
             response = await self._client.chat.completions.create(

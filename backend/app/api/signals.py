@@ -7,8 +7,16 @@ from app.auth.dependencies import get_current_user
 from app.db.dependencies import get_db
 from app.models.enums import ScrapeSourceType, SignalStatus, SignalType
 from app.models.user import User
-from app.schemas.signal import SignalListResponse, SignalResponse
-from app.services.signal_service import get_signal_by_id, list_signals
+from app.schemas.lead import LeadResponse
+from app.schemas.signal import SignalListResponse, SignalResponse, SignalUpdate
+from app.services.lead_service import SignalNotConvertibleError, convert_signal_to_lead
+from app.services.signal_service import (
+    InvalidSignalUpdateError,
+    SignalNotFoundError,
+    get_signal_by_id,
+    list_signals,
+    update_signal,
+)
 
 router = APIRouter(tags=["signals"])
 
@@ -54,3 +62,47 @@ def get_signal_endpoint(
     if signal is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Signal not found")
     return signal
+
+
+@router.patch("/signals/{signal_id}", response_model=SignalResponse)
+def update_signal_endpoint(
+    signal_id: uuid.UUID,
+    payload: SignalUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    try:
+        return update_signal(
+            db,
+            current_user.organization_id,
+            signal_id,
+            current_user.id,
+            payload,
+        )
+    except SignalNotFoundError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Signal not found") from None
+    except InvalidSignalUpdateError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from None
+
+
+@router.post(
+    "/signals/{signal_id}/convert",
+    response_model=LeadResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def convert_signal_to_lead_endpoint(
+    signal_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    try:
+        return convert_signal_to_lead(
+            db,
+            current_user.organization_id,
+            signal_id,
+            current_user.id,
+        )
+    except SignalNotFoundError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Signal not found") from None
+    except SignalNotConvertibleError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from None

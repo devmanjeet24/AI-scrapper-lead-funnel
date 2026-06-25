@@ -48,3 +48,37 @@ class SignalPriority(str, enum.Enum):
     low = "low"
     medium = "medium"
     high = "high"
+
+
+class LeadStatus(str, enum.Enum):
+    new = "new"
+    contacted = "contacted"
+    won = "won"
+    lost = "lost"
+    archived = "archived"
+
+
+class CreativeSetStatus(str, enum.Enum):
+    pending = "pending"
+    generating = "generating"
+    completed = "completed"
+    failed = "failed"
+
+
+class CreativeAssetType(str, enum.Enum):
+    headline = "headline"
+    ad_copy = "ad_copy"
+    campaign_idea = "campaign_idea"
+    targeting_suggestion = "targeting_suggestion"
+
+
+class CreativeAssetStatus(str, enum.Enum):
+    draft = "draft"
+    approved = "approved"
+    rejected = "rejected"
+
+
+class DeploymentPackageStatus(str, enum.Enum):
+    ready = "ready"
+    deployed = "deployed"
+    failed = "failed"
