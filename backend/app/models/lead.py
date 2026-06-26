@@ -13,9 +13,12 @@ from app.models.enums import LeadStatus, SignalPriority
 from app.models.mixins import TimestampMixin, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
+    from app.models.appointment import Appointment
     from app.models.creative_set import CreativeSet
     from app.models.deployment_package import DeploymentPackage
     from app.models.organization import Organization
+    from app.models.outreach_campaign import OutreachCampaign
+    from app.models.outreach_conversation import OutreachConversation
     from app.models.scrape_job import ScrapeJob
     from app.models.scrape_result import ScrapeResult
     from app.models.signal import Signal
@@ -110,6 +113,18 @@ class Lead(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         cascade="all, delete-orphan",
     )
     deployment_packages: Mapped[list[DeploymentPackage]] = relationship(
+        back_populates="lead",
+        cascade="all, delete-orphan",
+    )
+    outreach_campaigns: Mapped[list[OutreachCampaign]] = relationship(
+        back_populates="lead",
+        cascade="all, delete-orphan",
+    )
+    outreach_conversations: Mapped[list[OutreachConversation]] = relationship(
+        back_populates="lead",
+        cascade="all, delete-orphan",
+    )
+    appointments: Mapped[list[Appointment]] = relationship(
         back_populates="lead",
         cascade="all, delete-orphan",
     )

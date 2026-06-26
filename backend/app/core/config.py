@@ -42,5 +42,27 @@ class Settings(BaseSettings):
     ai_max_input_chars: int = 6_000
     ai_max_signals_per_page: int = 5
 
+    # Optional ad platform credentials (Phase 5 — not required for prototype)
+    facebook_ads_access_token: str | None = None
+    google_ads_developer_token: str | None = None
+    linkedin_ads_access_token: str | None = None
+
+    # Optional outreach credentials (Phase 6 — not required for prototype)
+    resend_api_key: str | None = None
+    retell_api_key: str | None = None
+    vapi_api_key: str | None = None
+
+    # Google Calendar / OAuth (Phase 7)
+    google_client_id: str | None = None
+    google_client_secret: str | None = None
+    google_redirect_uri: str = "http://localhost:8000/integrations/google-calendar/callback"
+    google_calendar_id: str = "primary"
+    google_oauth_encryption_key: str | None = None
+    appointment_default_duration_minutes: int = 30
+    appointment_slot_buffer_minutes: int = 15
+    appointment_booking_horizon_days: int = 14
+    sales_team_email: str | None = None
+    sales_handoff_webhook_url: str | None = None
+
 
 settings = Settings()

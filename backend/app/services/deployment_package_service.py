@@ -242,38 +242,19 @@ def list_deployment_packages(
     return list(packages), total
 
 
-def execute_deployment_package(
+async def execute_deployment_package(
     db: Session,
     organization_id: uuid.UUID,
     package_id: uuid.UUID,
+    *,
+    mode: str | None = None,
 ) -> DeploymentPackage:
-    package = get_deployment_package(db, organization_id, package_id)
-    if package is None:
-        raise DeploymentPackageNotFoundError
+    """Execute deployment — delegates to Agent 2 when AI is enabled."""
+    from app.services.deployment_monitoring_service import execute_deployment_package_with_agent
 
-    if package.status == DeploymentPackageStatus.deployed:
-        return package
-
-    if package.status != DeploymentPackageStatus.ready:
-        raise InvalidDeploymentPackageError(
-            f"Cannot execute deployment package with status '{package.status.value}'"
-        )
-
-    now = datetime.now(UTC)
-    package.status = DeploymentPackageStatus.deployed
-    package.deployed_at = now
-    package.deploy_result = {
-        "mode": "export",
-        "message": (
-            "Simulated deployment complete. Use the package payload to manually "
-            "publish creatives to your ad platform."
-        ),
-        "channel_hint": package.channel_hint,
-        "asset_counts": {
-            key: len(value)
-            for key, value in package.payload.get("assets", {}).items()
-        },
-    }
-    db.commit()
-    db.refresh(package)
-    return package
+    return await execute_deployment_package_with_agent(
+        db,
+        organization_id,
+        package_id,
+        mode=mode,
+    )

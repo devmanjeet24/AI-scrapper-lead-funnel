@@ -11,10 +11,14 @@ from app.db.database import Base
 from app.models.mixins import TimestampMixin, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
+    from app.models.appointment import Appointment
     from app.models.creative_asset import CreativeAsset
     from app.models.creative_set import CreativeSet
+    from app.models.deployment_monitor_snapshot import DeploymentMonitorSnapshot
     from app.models.deployment_package import DeploymentPackage
+    from app.models.google_calendar_connection import GoogleCalendarConnection
     from app.models.lead import Lead
+    from app.models.outreach_campaign import OutreachCampaign
     from app.models.organization import Organization
     from app.models.scrape_job import ScrapeJob
     from app.models.scrape_result import ScrapeResult
@@ -58,4 +62,20 @@ class User(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     created_deployment_packages: Mapped[list[DeploymentPackage]] = relationship(
         back_populates="created_by",
         foreign_keys="DeploymentPackage.created_by_id",
+    )
+    recorded_monitor_snapshots: Mapped[list[DeploymentMonitorSnapshot]] = relationship(
+        back_populates="recorded_by",
+        foreign_keys="DeploymentMonitorSnapshot.recorded_by_id",
+    )
+    created_outreach_campaigns: Mapped[list[OutreachCampaign]] = relationship(
+        back_populates="created_by",
+        foreign_keys="OutreachCampaign.created_by_id",
+    )
+    google_calendar_connections: Mapped[list[GoogleCalendarConnection]] = relationship(
+        back_populates="connected_by",
+        foreign_keys="GoogleCalendarConnection.connected_by_id",
+    )
+    created_appointments: Mapped[list[Appointment]] = relationship(
+        back_populates="created_by",
+        foreign_keys="Appointment.created_by_id",
     )

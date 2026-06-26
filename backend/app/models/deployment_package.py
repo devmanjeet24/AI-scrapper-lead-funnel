@@ -14,8 +14,11 @@ from app.models.mixins import TimestampMixin, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
     from app.models.creative_set import CreativeSet
+    from app.models.deployment_monitor_snapshot import DeploymentMonitorSnapshot
+    from app.models.deployment_package import DeploymentPackage
     from app.models.lead import Lead
     from app.models.organization import Organization
+    from app.models.outreach_campaign import OutreachCampaign
     from app.models.user import User
 
 
@@ -64,6 +67,7 @@ class DeploymentPackage(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     deploy_result: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
     deployed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    agent_metadata: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict)
 
     organization: Mapped[Organization] = relationship(back_populates="deployment_packages")
     creative_set: Mapped[CreativeSet] = relationship(back_populates="deployment_package")
@@ -71,4 +75,12 @@ class DeploymentPackage(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     created_by: Mapped[User | None] = relationship(
         back_populates="created_deployment_packages",
         foreign_keys=[created_by_id],
+    )
+    monitor_snapshots: Mapped[list[DeploymentMonitorSnapshot]] = relationship(
+        back_populates="deployment_package",
+        cascade="all, delete-orphan",
+        order_by="DeploymentMonitorSnapshot.recorded_at",
+    )
+    outreach_campaigns: Mapped[list[OutreachCampaign]] = relationship(
+        back_populates="deployment_package",
     )
