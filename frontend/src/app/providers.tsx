@@ -15,7 +15,7 @@ interface AppProvidersProps {
 export function AppProviders({ children }: AppProvidersProps) {
   return (
     <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
+      <PersistGate persistor={persistor}>
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
             {children}

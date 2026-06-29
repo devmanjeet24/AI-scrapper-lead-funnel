@@ -1,1 +1,19 @@
 @import "tailwindcss";
+
+@theme {
+  --color-background: rgb(235 244 240);
+  --color-primary: rgb(28 200 141);
+  --color-foreground: rgb(45 45 45);
+}
+
+:root {
+  --background: rgb(235 244 240);
+  --primary: rgb(28 200 141);
+  --foreground: rgb(45 45 45);
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}

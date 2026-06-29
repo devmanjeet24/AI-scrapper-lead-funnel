@@ -9,9 +9,8 @@ import {
   persistReducer,
   persistStore,
 } from 'redux-persist'
-import storage from 'redux-persist/lib/storage'
-
 import authReducer from '@/store/slices/authSlice'
+import { storage } from '@/store/storage'
 
 const rootReducer = combineReducers({
   auth: authReducer,
