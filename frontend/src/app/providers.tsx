@@ -4,8 +4,10 @@ import type { ReactNode } from 'react'
 import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
 import { PersistGate } from 'redux-persist/integration/react'
+import { Toaster } from 'sonner'
 
 import { queryClient } from '@/app/query-client'
+import { AuthBootstrap } from '@/components/auth/AuthBootstrap'
 import { persistor, store } from '@/store'
 
 interface AppProvidersProps {
@@ -18,7 +20,10 @@ export function AppProviders({ children }: AppProvidersProps) {
       <PersistGate persistor={persistor}>
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
-            {children}
+            <AuthBootstrap>
+              {children}
+            </AuthBootstrap>
+            <Toaster position="top-center" richColors closeButton />
             {import.meta.env.DEV ? (
               <ReactQueryDevtools initialIsOpen={false} />
             ) : null}

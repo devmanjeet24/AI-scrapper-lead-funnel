@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.appointments import router as appointments_router
 from app.api.auth import router as auth_router
@@ -10,11 +11,20 @@ from app.api.leads import router as leads_router
 from app.api.outreach import router as outreach_router
 from app.api.scrape_jobs import router as scrape_jobs_router
 from app.api.signals import router as signals_router
+from app.core.config import settings
 
 app = FastAPI(
     title="AI Scraper Lead Funnel",
     description="Backend API for scraping, campaigns, agents, and lead management.",
     version="0.1.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origin_list,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(health_router)

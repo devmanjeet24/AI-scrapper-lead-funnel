@@ -86,6 +86,13 @@ class UserLoginRequest(BaseModel):
         return _validate_password(value)
 
 
+class OrganizationSummary(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    name: str
+
+
 class UserResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -95,6 +102,7 @@ class UserResponse(BaseModel):
     email: EmailStr
     is_active: bool
     created_at: datetime
+    organization: OrganizationSummary
 
 
 class TokenResponse(BaseModel):

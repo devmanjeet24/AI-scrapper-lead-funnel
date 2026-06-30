@@ -1,3 +1,5 @@
+import { FinalCtaSection } from '@/components/cta/FinalCtaSection'
+import { FaqSection } from '@/components/faq/FaqSection'
 import { Footer } from '@/components/footer/Footer'
 import { StickyFeatureShowcase } from '@/components/feature-showcase/StickyFeatureShowcase'
 import { HeroSection } from '@/components/hero/HeroSection'
@@ -12,6 +14,8 @@ export function HomePage() {
         <HeroSection />
         <SocialProofSection />
         <StickyFeatureShowcase />
+        <FaqSection />
+        <FinalCtaSection />
         <Footer />
       </div>
     </div>
