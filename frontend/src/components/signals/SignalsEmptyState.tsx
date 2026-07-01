@@ -1,13 +1,13 @@
-import { Plus, Users } from 'lucide-react'
+import { Radio } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 import { cn } from '@/lib/utils'
 
-interface LeadsEmptyStateProps {
+interface SignalsEmptyStateProps {
   hasFilters: boolean
-  onCreateLead: () => void
 }
 
-export function LeadsEmptyState({ hasFilters, onCreateLead }: LeadsEmptyStateProps) {
+export function SignalsEmptyState({ hasFilters }: SignalsEmptyStateProps) {
   return (
     <div
       className={cn(
@@ -16,29 +16,27 @@ export function LeadsEmptyState({ hasFilters, onCreateLead }: LeadsEmptyStatePro
       )}
     >
       <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-foreground/5 text-foreground/60">
-        <Users className="size-7" />
+        <Radio className="size-7" />
       </div>
       <h3 className="text-lg font-semibold text-foreground">
-        {hasFilters ? 'No leads match your filters' : 'No leads yet'}
+        {hasFilters ? 'No signals match your search' : 'No signals yet'}
       </h3>
       <p className="mt-2 max-w-sm text-sm text-muted">
         {hasFilters
           ? 'Try adjusting your search or filters to find what you are looking for.'
-          : 'Create your first lead to start tracking prospects through your pipeline.'}
+          : 'Signals appear automatically when scrape jobs run and AI analyzes pages.'}
       </p>
       {!hasFilters ? (
-        <button
-          type="button"
-          onClick={onCreateLead}
+        <Link
+          to="/scrape-jobs"
           className={cn(
             'mt-6 inline-flex items-center gap-2 rounded-[var(--radius-button)] bg-primary px-5 py-2.5',
             'text-sm font-semibold text-white shadow-[var(--shadow-button)]',
             'transition-shadow hover:shadow-[var(--shadow-button-hover)]',
           )}
         >
-          <Plus className="size-4" />
-          Create Lead
-        </button>
+          View Scrape Jobs
+        </Link>
       ) : null}
     </div>
   )

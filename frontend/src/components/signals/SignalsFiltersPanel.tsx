@@ -1,28 +1,31 @@
 import { SlidersHorizontal, X } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 
-import { LEAD_PRIORITY_OPTIONS, LEAD_STATUS_OPTIONS } from '@/lib/leads'
+import { LEAD_PRIORITY_OPTIONS } from '@/lib/leads'
+import { SIGNAL_TYPE_OPTIONS, SOURCE_TYPE_OPTIONS } from '@/lib/signals'
 import { cn } from '@/lib/utils'
-import type { LeadStatus, SignalPriority } from '@/types/lead'
+import type { SignalPriority } from '@/types/lead'
+import type { ScrapeSourceType, SignalType } from '@/types/signal'
 
-export interface LeadFilters {
-  status?: LeadStatus
+export interface SignalFilters {
+  signal_type?: SignalType
+  source_type?: ScrapeSourceType
   priority?: SignalPriority
 }
 
-interface LeadsFiltersPanelProps {
+interface SignalsFiltersPanelProps {
   open: boolean
-  filters: LeadFilters
-  onChange: (filters: LeadFilters) => void
+  filters: SignalFilters
+  onChange: (filters: SignalFilters) => void
   onClose: () => void
 }
 
-export function LeadsFiltersPanel({
+export function SignalsFiltersPanel({
   open,
   filters,
   onChange,
   onClose,
-}: LeadsFiltersPanelProps) {
+}: SignalsFiltersPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -48,7 +51,9 @@ export function LeadsFiltersPanel({
 
   if (!open) return null
 
-  const activeCount = [filters.status, filters.priority].filter(Boolean).length
+  const activeCount = [filters.signal_type, filters.source_type, filters.priority].filter(
+    Boolean,
+  ).length
 
   return (
     <div
@@ -80,16 +85,16 @@ export function LeadsFiltersPanel({
 
       <div className="space-y-4">
         <div className="space-y-1.5">
-          <label htmlFor="filter-status" className="text-xs font-medium text-muted">
-            Status
+          <label htmlFor="filter-signal-type" className="text-xs font-medium text-muted">
+            Signal type
           </label>
           <select
-            id="filter-status"
-            value={filters.status ?? ''}
+            id="filter-signal-type"
+            value={filters.signal_type ?? ''}
             onChange={(event) =>
               onChange({
                 ...filters,
-                status: (event.target.value as LeadStatus) || undefined,
+                signal_type: (event.target.value as SignalType) || undefined,
               })
             }
             className={cn(
@@ -97,8 +102,8 @@ export function LeadsFiltersPanel({
               'focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/15',
             )}
           >
-            <option value="">All statuses</option>
-            {LEAD_STATUS_OPTIONS.map((option) => (
+            <option value="">All types</option>
+            {SIGNAL_TYPE_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
@@ -107,11 +112,38 @@ export function LeadsFiltersPanel({
         </div>
 
         <div className="space-y-1.5">
-          <label htmlFor="filter-priority" className="text-xs font-medium text-muted">
+          <label htmlFor="filter-source-type" className="text-xs font-medium text-muted">
+            Source type
+          </label>
+          <select
+            id="filter-source-type"
+            value={filters.source_type ?? ''}
+            onChange={(event) =>
+              onChange({
+                ...filters,
+                source_type: (event.target.value as ScrapeSourceType) || undefined,
+              })
+            }
+            className={cn(
+              'w-full rounded-xl border border-border/80 bg-background px-3 py-2 text-sm text-foreground',
+              'focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/15',
+            )}
+          >
+            <option value="">All sources</option>
+            {SOURCE_TYPE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="space-y-1.5">
+          <label htmlFor="filter-signal-priority" className="text-xs font-medium text-muted">
             Priority
           </label>
           <select
-            id="filter-priority"
+            id="filter-signal-priority"
             value={filters.priority ?? ''}
             onChange={(event) =>
               onChange({

@@ -10,20 +10,20 @@ import {
   Users,
 } from 'lucide-react'
 
-export const KPI_METRICS = [
-  { id: 'signals', label: 'Signals Found', value: 1284, delta: '+142 today', icon: Radio },
-  { id: 'leads', label: 'Qualified Leads', value: 342, delta: '+38 today', icon: Users },
-  { id: 'creatives', label: 'Creatives Generated', value: 298, delta: '+24 today', icon: Palette },
-  { id: 'outreach', label: 'Active Outreach', value: 156, delta: '12 sequences', icon: Send },
-  { id: 'meetings', label: 'Meetings Booked', value: 28, delta: '+5 this week', icon: CalendarCheck },
+export const KPI_DEFINITIONS = [
+  { id: 'signals', label: 'Signals Found', icon: Radio },
+  { id: 'leads', label: 'Qualified Leads', icon: Users },
+  { id: 'creatives', label: 'Creatives Generated', icon: Palette },
+  { id: 'outreach', label: 'Active Outreach', icon: Send },
+  { id: 'meetings', label: 'Meetings Booked', icon: CalendarCheck },
 ] as const
 
-export const PIPELINE_STAGES = [
-  { id: 'signals', label: 'Signals', count: 1284, icon: Radio },
-  { id: 'leads', label: 'Leads', count: 342, icon: Users },
-  { id: 'creatives', label: 'Creatives', count: 298, icon: Palette },
-  { id: 'outreach', label: 'Outreach', count: 156, icon: Send },
-  { id: 'meetings', label: 'Meetings', count: 28, icon: CalendarCheck },
+export const PIPELINE_STAGE_DEFINITIONS = [
+  { id: 'signals', label: 'Signals', icon: Radio },
+  { id: 'leads', label: 'Leads', icon: Users },
+  { id: 'creatives', label: 'Creatives', icon: Palette },
+  { id: 'outreach', label: 'Outreach', icon: Send },
+  { id: 'meetings', label: 'Meetings', icon: CalendarCheck },
 ] as const
 
 export type ActivityType =

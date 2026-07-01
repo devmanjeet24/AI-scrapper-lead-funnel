@@ -2,31 +2,34 @@ import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react'
 import { format } from 'date-fns'
 
 import { LeadPriorityBadge } from '@/components/leads/LeadPriorityBadge'
-import { LeadStatusBadge } from '@/components/leads/LeadStatusBadge'
-import { getLeadCompany, getLeadSourceSignal } from '@/lib/leads'
+import { SignalStatusBadge } from '@/components/signals/SignalStatusBadge'
+import { SignalTypeBadge } from '@/components/signals/SignalTypeBadge'
+import { getSignalDetectedAt, getSignalLeadScore } from '@/lib/signals'
 import { cn } from '@/lib/utils'
-import type { Lead, LeadSortField, SortDirection } from '@/types/lead'
+import type { Signal, SignalSortField, SortDirection } from '@/types/signal'
 
-interface LeadsTableProps {
-  leads: Lead[]
-  sortField: LeadSortField
+interface SignalsTableProps {
+  signals: Signal[]
+  sortField: SignalSortField
   sortDirection: SortDirection
-  onSort: (field: LeadSortField) => void
+  onSort: (field: SignalSortField) => void
+  onSignalClick?: (signal: Signal) => void
 }
 
 interface Column {
-  field: LeadSortField
+  field: SignalSortField
   label: string
   className?: string
 }
 
 const COLUMNS: Column[] = [
-  { field: 'title', label: 'Company', className: 'min-w-[180px]' },
-  { field: 'lead_score', label: 'Lead Score', className: 'w-28' },
+  { field: 'title', label: 'Signal', className: 'min-w-[200px]' },
+  { field: 'lead_score', label: 'Score', className: 'w-24' },
+  { field: 'signal_type', label: 'Type', className: 'w-32' },
   { field: 'status', label: 'Status', className: 'w-32' },
-  { field: 'source_label', label: 'Source Signal', className: 'min-w-[160px]' },
   { field: 'priority', label: 'Priority', className: 'w-28' },
-  { field: 'created_at', label: 'Created Date', className: 'w-36' },
+  { field: 'source_label', label: 'Source', className: 'min-w-[140px]' },
+  { field: 'detected_at', label: 'Detected', className: 'w-36' },
 ]
 
 function SortIcon({
@@ -34,8 +37,8 @@ function SortIcon({
   sortField,
   sortDirection,
 }: {
-  field: LeadSortField
-  sortField: LeadSortField
+  field: SignalSortField
+  sortField: SignalSortField
   sortDirection: SortDirection
 }) {
   if (field !== sortField) {
@@ -61,7 +64,13 @@ function LeadScoreCell({ score }: { score: number | null }) {
   )
 }
 
-export function LeadsTable({ leads, sortField, sortDirection, onSort }: LeadsTableProps) {
+export function SignalsTable({
+  signals,
+  sortField,
+  sortDirection,
+  onSort,
+  onSignalClick,
+}: SignalsTableProps) {
   return (
     <div
       className={cn(
@@ -70,7 +79,7 @@ export function LeadsTable({ leads, sortField, sortDirection, onSort }: LeadsTab
       )}
     >
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[760px] border-collapse text-left">
+        <table className="w-full min-w-[880px] border-collapse text-left">
           <thead>
             <tr className="border-b border-border bg-section-alt">
               {COLUMNS.map((column) => (
@@ -92,46 +101,54 @@ export function LeadsTable({ leads, sortField, sortDirection, onSort }: LeadsTab
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {leads.map((lead) => {
-              const sourceSignal = getLeadSourceSignal(lead)
+            {signals.map((signal) => {
+              const detectedAt = getSignalDetectedAt(signal)
 
               return (
                 <tr
-                  key={lead.id}
-                  className="transition-colors hover:bg-foreground/[0.03]"
+                  key={signal.id}
+                  onClick={() => onSignalClick?.(signal)}
+                  className={cn(
+                    'transition-colors hover:bg-foreground/[0.03]',
+                    onSignalClick && 'cursor-pointer',
+                    signal.status === 'new' && 'bg-primary-soft/20',
+                  )}
                 >
                   <td className="px-5 py-4">
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium text-foreground">
-                        {getLeadCompany(lead)}
+                        {signal.title}
                       </p>
-                      {lead.summary ? (
-                        <p className="mt-0.5 truncate text-xs text-muted">{lead.summary}</p>
+                      {signal.summary ? (
+                        <p className="mt-0.5 truncate text-xs text-muted">{signal.summary}</p>
                       ) : null}
                     </div>
                   </td>
                   <td className="px-5 py-4">
-                    <LeadScoreCell score={lead.lead_score} />
+                    <LeadScoreCell score={getSignalLeadScore(signal)} />
                   </td>
                   <td className="px-5 py-4">
-                    <LeadStatusBadge status={lead.status} />
+                    <SignalTypeBadge signalType={signal.signal_type} />
                   </td>
                   <td className="px-5 py-4">
-                    {sourceSignal ? (
-                      <span className="text-sm text-foreground">{sourceSignal}</span>
+                    <SignalStatusBadge status={signal.status} />
+                  </td>
+                  <td className="px-5 py-4">
+                    <LeadPriorityBadge priority={signal.priority} />
+                  </td>
+                  <td className="px-5 py-4">
+                    {signal.source_label ? (
+                      <span className="truncate text-sm text-foreground">{signal.source_label}</span>
                     ) : (
                       <span className="text-sm text-muted">—</span>
                     )}
                   </td>
                   <td className="px-5 py-4">
-                    <LeadPriorityBadge priority={lead.priority} />
-                  </td>
-                  <td className="px-5 py-4">
                     <time
-                      dateTime={lead.created_at}
+                      dateTime={detectedAt}
                       className="text-sm tabular-nums text-muted"
                     >
-                      {format(new Date(lead.created_at), 'MMM d, yyyy')}
+                      {format(new Date(detectedAt), 'MMM d, yyyy')}
                     </time>
                   </td>
                 </tr>

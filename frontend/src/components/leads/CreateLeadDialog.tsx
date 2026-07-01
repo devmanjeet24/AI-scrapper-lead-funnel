@@ -224,8 +224,8 @@ export function CreateLeadDialog({ open, onClose }: CreateLeadDialogProps) {
               disabled={createLeadMutation.isPending}
               className={cn(
                 'inline-flex items-center gap-2 rounded-[var(--radius-button)] bg-primary px-5 py-2.5',
-                'text-sm font-semibold text-white shadow-[0_8px_24px_rgb(28_200_141/0.35)]',
-                'transition-shadow hover:shadow-[0_12px_32px_rgb(28_200_141/0.45)] disabled:opacity-60',
+                'text-sm font-semibold text-white shadow-[var(--shadow-button)]',
+                'transition-shadow hover:shadow-[var(--shadow-button-hover)] disabled:opacity-60',
               )}
             >
               {createLeadMutation.isPending ? (

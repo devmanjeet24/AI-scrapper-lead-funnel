@@ -13,6 +13,7 @@ import {
 import { LeadsTable } from '@/components/leads/LeadsTable'
 import { LeadsTableSkeleton } from '@/components/leads/LeadsTableSkeleton'
 import type { LeadFilters } from '@/components/leads/LeadsFiltersPanel'
+import { DashboardAtmosphere } from '@/components/dashboard/DashboardAtmosphere'
 import { SIDEBAR_NAV } from '@/components/dashboard/dashboard-data'
 import { useLeadsQuery } from '@/hooks/useLeads'
 import {
@@ -90,18 +91,11 @@ export function LeadsPage() {
   }
 
   return (
-    <div className="relative min-h-screen">
-      <div
-        className="pointer-events-none fixed inset-0 opacity-40"
-        style={{
-          backgroundImage:
-            'radial-gradient(circle at 1px 1px, rgb(28 200 141 / 0.06) 1px, transparent 0)',
-          backgroundSize: '28px 28px',
-        }}
-      />
+    <div className="relative isolate min-h-full bg-background">
+      <DashboardAtmosphere />
 
-      <div className="relative flex flex-col">
-        <div className="border-b border-border/60 bg-surface-solid/80 px-4 py-3 backdrop-blur-xl lg:hidden">
+      <div className="relative z-0 flex flex-col">
+        <div className="glass-surface border-b border-border px-4 py-3 lg:hidden">
           <nav className="flex gap-1 overflow-x-auto pb-0.5">
             {SIDEBAR_NAV.map((item) => {
               const Icon = item.icon
@@ -114,11 +108,11 @@ export function LeadsPage() {
                   className={cn(
                     'inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-colors',
                     isActive
-                      ? 'bg-primary-soft text-foreground'
-                      : 'text-muted hover:bg-primary-soft/50 hover:text-foreground',
+                      ? 'sidebar-active-wash border-l-[3px] border-primary bg-surface-solid pl-[calc(0.75rem-3px)] font-semibold text-foreground shadow-[var(--shadow-soft)]'
+                      : 'text-muted hover:bg-foreground/[0.04] hover:text-foreground',
                   )}
                 >
-                  <Icon className="size-3.5" />
+                  <Icon className={cn('size-3.5', isActive && 'text-primary')} />
                   {item.label}
                 </Link>
               )
