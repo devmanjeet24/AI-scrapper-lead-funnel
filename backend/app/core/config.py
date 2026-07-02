@@ -55,6 +55,8 @@ class Settings(BaseSettings):
 
     # Optional outreach credentials (Phase 6 — not required for prototype)
     resend_api_key: str | None = None
+    resend_from_email: str = "onboarding@resend.dev"
+    resend_reply_to: str | None = None
     retell_api_key: str | None = None
     vapi_api_key: str | None = None
 
