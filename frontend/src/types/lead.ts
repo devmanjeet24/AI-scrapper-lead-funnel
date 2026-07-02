@@ -56,6 +56,19 @@ export interface LeadCreateRequest {
   extracted_data?: Record<string, unknown>
 }
 
+export interface LeadUpdateRequest {
+  title?: string
+  summary?: string | null
+  source_url?: string | null
+  source_label?: string | null
+  priority?: SignalPriority | null
+  lead_score?: number | null
+  recommendation?: string | null
+  notes?: string | null
+  status?: LeadStatus
+  closed_reason?: string | null
+}
+
 export type LeadSortField =
   | 'title'
   | 'lead_score'

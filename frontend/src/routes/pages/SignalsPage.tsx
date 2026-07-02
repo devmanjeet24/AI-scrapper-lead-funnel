@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { isAxiosError } from 'axios'
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useSearchParams } from 'react-router-dom'
 
 import { DashboardAtmosphere } from '@/components/dashboard/DashboardAtmosphere'
 import { SIDEBAR_NAV } from '@/components/dashboard/dashboard-data'
@@ -41,8 +41,12 @@ function getErrorMessage(error: unknown): string {
 
 export function SignalsPage() {
   const { pathname } = useLocation()
+  const [searchParams] = useSearchParams()
+  const scrapeJobIdFilter = searchParams.get('scrape_job_id')
   const [searchQuery, setSearchQuery] = useState('')
-  const [statusTab, setStatusTab] = useState<SignalStatusTab>('new')
+  const [statusTab, setStatusTab] = useState<SignalStatusTab>(
+    scrapeJobIdFilter ? 'all' : 'new',
+  )
   const [filters, setFilters] = useState<SignalFilters>({})
   const [sortField, setSortField] = useState<SignalSortField>('detected_at')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
@@ -59,10 +63,19 @@ export function SignalsPage() {
       status: statusTab === 'all' ? undefined : statusTab,
       signal_type: filters.signal_type,
       source_type: filters.source_type,
+      scrape_job_id: scrapeJobIdFilter ?? undefined,
       limit: isClientFilterActive ? SEARCH_FETCH_LIMIT : PAGE_SIZE,
       offset: isClientFilterActive ? 0 : (page - 1) * PAGE_SIZE,
     }),
-    [statusTab, filters.signal_type, filters.source_type, filters.priority, isClientFilterActive, page],
+    [
+      statusTab,
+      filters.signal_type,
+      filters.source_type,
+      filters.priority,
+      scrapeJobIdFilter,
+      isClientFilterActive,
+      page,
+    ],
   )
 
   const { data, isLoading, isError, error, refetch, isFetching } = useSignalsQuery(apiParams)

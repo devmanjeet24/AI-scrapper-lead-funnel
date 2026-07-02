@@ -12,6 +12,7 @@ interface LeadsTableProps {
   sortField: LeadSortField
   sortDirection: SortDirection
   onSort: (field: LeadSortField) => void
+  onLeadClick?: (lead: Lead) => void
 }
 
 interface Column {
@@ -61,7 +62,7 @@ function LeadScoreCell({ score }: { score: number | null }) {
   )
 }
 
-export function LeadsTable({ leads, sortField, sortDirection, onSort }: LeadsTableProps) {
+export function LeadsTable({ leads, sortField, sortDirection, onSort, onLeadClick }: LeadsTableProps) {
   return (
     <div
       className={cn(
@@ -98,7 +99,11 @@ export function LeadsTable({ leads, sortField, sortDirection, onSort }: LeadsTab
               return (
                 <tr
                   key={lead.id}
-                  className="transition-colors hover:bg-foreground/[0.03]"
+                  onClick={() => onLeadClick?.(lead)}
+                  className={cn(
+                    'transition-colors hover:bg-foreground/[0.03]',
+                    onLeadClick && 'cursor-pointer',
+                  )}
                 >
                   <td className="px-5 py-4">
                     <div className="min-w-0">

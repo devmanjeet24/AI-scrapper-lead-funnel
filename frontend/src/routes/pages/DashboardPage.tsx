@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 import { ActivityFeed } from '@/components/dashboard/ActivityFeed'
 import { AgentStatus } from '@/components/dashboard/AgentStatus'
@@ -11,6 +11,8 @@ import { SIDEBAR_NAV } from '@/components/dashboard/dashboard-data'
 import { cn } from '@/lib/utils'
 
 export function DashboardPage() {
+  const { pathname } = useLocation()
+
   return (
     <div className="relative isolate min-h-full bg-background">
       <DashboardAtmosphere />
@@ -20,7 +22,7 @@ export function DashboardPage() {
           <nav className="flex gap-1 overflow-x-auto pb-0.5">
             {SIDEBAR_NAV.map((item) => {
               const Icon = item.icon
-              const isActive = item.href === '/dashboard'
+              const isActive = pathname === item.href
 
               return (
                 <Link

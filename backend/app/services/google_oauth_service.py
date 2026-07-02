@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import uuid
 from datetime import UTC, datetime, timedelta
+from secrets import SystemRandom
+from string import ascii_letters, digits
 from typing import Any
 from urllib.parse import urlencode
 
@@ -53,31 +55,58 @@ def _client_config() -> dict[str, Any]:
     }
 
 
-def create_oauth_state(organization_id: uuid.UUID, user_id: uuid.UUID) -> str:
+def _generate_code_verifier() -> str:
+    chars = ascii_letters + digits + "-._~"
+    rnd = SystemRandom()
+    return "".join(rnd.choice(chars) for _ in range(128))
+
+
+def _create_oauth_flow(*, code_verifier: str) -> Flow:
+    return Flow.from_client_config(
+        _client_config(),
+        scopes=GOOGLE_CALENDAR_SCOPES,
+        redirect_uri=settings.google_redirect_uri,
+        code_verifier=code_verifier,
+        autogenerate_code_verifier=False,
+    )
+
+
+def create_oauth_state(
+    organization_id: uuid.UUID,
+    user_id: uuid.UUID,
+    *,
+    code_verifier: str,
+) -> str:
     payload = {
         "org_id": str(organization_id),
         "user_id": str(user_id),
+        "cv": code_verifier,
         "exp": datetime.now(UTC) + timedelta(minutes=15),
     }
     return jwt.encode(payload, settings.secret_key, algorithm=settings.algorithm)
 
 
-def verify_oauth_state(state: str) -> tuple[uuid.UUID, uuid.UUID]:
+def verify_oauth_state(state: str) -> tuple[uuid.UUID, uuid.UUID, str]:
     try:
         payload = jwt.decode(state, settings.secret_key, algorithms=[settings.algorithm])
         org_id = uuid.UUID(payload["org_id"])
         user_id = uuid.UUID(payload["user_id"])
-        return org_id, user_id
+        code_verifier = payload["cv"]
+        if not isinstance(code_verifier, str) or not code_verifier:
+            raise GoogleOAuthError("Invalid or expired OAuth state")
+        return org_id, user_id, code_verifier
     except (JWTError, KeyError, ValueError) as exc:
         raise GoogleOAuthError("Invalid or expired OAuth state") from exc
 
 
-def build_authorization_url(*, state: str) -> str:
+def build_authorization_url(*, organization_id: uuid.UUID, user_id: uuid.UUID) -> str:
     _require_oauth_config()
-    flow = Flow.from_client_config(
-        _client_config(),
-        scopes=GOOGLE_CALENDAR_SCOPES,
-        redirect_uri=settings.google_redirect_uri,
+    code_verifier = _generate_code_verifier()
+    flow = _create_oauth_flow(code_verifier=code_verifier)
+    state = create_oauth_state(
+        organization_id,
+        user_id,
+        code_verifier=code_verifier,
     )
     auth_url, _ = flow.authorization_url(
         access_type="offline",
@@ -88,7 +117,7 @@ def build_authorization_url(*, state: str) -> str:
     return auth_url
 
 
-async def exchange_code_for_tokens(code: str) -> dict[str, Any]:
+async def exchange_code_for_tokens(code: str, *, code_verifier: str) -> dict[str, Any]:
     _require_oauth_config()
     async with httpx.AsyncClient(timeout=30.0) as client:
         response = await client.post(
@@ -99,6 +128,7 @@ async def exchange_code_for_tokens(code: str) -> dict[str, Any]:
                 "client_secret": settings.google_client_secret,
                 "redirect_uri": settings.google_redirect_uri,
                 "grant_type": "authorization_code",
+                "code_verifier": code_verifier,
             },
         )
     if response.status_code != 200:

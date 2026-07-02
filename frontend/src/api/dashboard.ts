@@ -1,8 +1,20 @@
-import type { DashboardStats, PaginatedTotalResponse, TimestampedItem } from '@/types/dashboard'
+import type { Appointment } from '@/types/appointment'
+import type { CreativeAsset } from '@/types/creative'
+import type {
+  DashboardActivityEvent,
+  DashboardStats,
+  PaginatedTotalResponse,
+  TimestampedItem,
+} from '@/types/dashboard'
+import type { Lead } from '@/types/lead'
+import type { OutreachCampaign } from '@/types/outreach'
+import type { Signal } from '@/types/signal'
 
+import { buildDashboardActivityEvents } from '@/lib/dashboard-activity'
 import { apiClient } from './client'
 
 const RECENT_LIMIT = 100
+const ACTIVITY_LIMIT = 30
 
 function countSince<T extends TimestampedItem>(items: T[], hours: number): number {
   const cutoff = Date.now() - hours * 60 * 60 * 1000
@@ -46,4 +58,33 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
     meetingsToday: countSince(meetings.recent, 24),
     activeOutreach: activeOutreach.total,
   }
+}
+
+export async function fetchDashboardActivity(): Promise<DashboardActivityEvent[]> {
+  const [signals, leads, creatives, outreach, appointments] = await Promise.all([
+    apiClient.get<PaginatedTotalResponse<Signal>>('/signals', {
+      params: { limit: ACTIVITY_LIMIT, offset: 0 },
+    }),
+    apiClient.get<PaginatedTotalResponse<Lead>>('/leads', {
+      params: { limit: ACTIVITY_LIMIT, offset: 0 },
+    }),
+    apiClient.get<PaginatedTotalResponse<CreativeAsset>>('/creative-assets', {
+      params: { limit: ACTIVITY_LIMIT, offset: 0 },
+    }),
+    apiClient.get<PaginatedTotalResponse<OutreachCampaign>>('/outreach-campaigns', {
+      params: { limit: ACTIVITY_LIMIT, offset: 0 },
+    }),
+    apiClient.get<PaginatedTotalResponse<Appointment>>('/appointments', {
+      params: { limit: ACTIVITY_LIMIT, offset: 0 },
+    }),
+  ])
+
+  return buildDashboardActivityEvents({
+    signals: signals.data.items,
+    leads: leads.data.items,
+    creatives: creatives.data.items,
+    outreach: outreach.data.items,
+    appointments: appointments.data.items,
+    limit: 50,
+  })
 }

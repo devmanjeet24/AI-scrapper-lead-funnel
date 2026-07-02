@@ -10,6 +10,7 @@ from app.api.health import router as health_router
 from app.api.leads import router as leads_router
 from app.api.outreach import router as outreach_router
 from app.api.scrape_jobs import router as scrape_jobs_router
+from app.api.settings import router as settings_router
 from app.api.signals import router as signals_router
 from app.core.config import settings
 
@@ -36,6 +37,7 @@ app.include_router(creatives_router)
 app.include_router(deployment_router)
 app.include_router(outreach_router)
 app.include_router(google_calendar_router)
+app.include_router(settings_router)
 app.include_router(appointments_router)
 
 
@@ -60,5 +62,6 @@ def read_root():
         "outreach": "/outreach-campaigns",
         "outreach_from_deployment": "/deployment-packages/{id}/outreach-campaigns",
         "google_calendar_connect": "/integrations/google-calendar/connect",
+        "settings_status": "/settings/status",
         "appointments": "/appointments",
     }

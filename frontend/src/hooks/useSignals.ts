@@ -172,7 +172,7 @@ export function useConvertSignalMutation() {
         action: {
           label: 'View Lead',
           onClick: () => {
-            window.location.href = `/leads?signal_id=${signalId}`
+            window.location.href = `/leads?lead_id=${lead.id}`
           },
         },
       })

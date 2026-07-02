@@ -13,7 +13,6 @@ from app.services.google_oauth_service import (
     GoogleOAuthError,
     GoogleOAuthNotConfiguredError,
     build_authorization_url,
-    create_oauth_state,
     encrypt_tokens_for_storage,
     exchange_code_for_tokens,
     fetch_google_email,
@@ -42,8 +41,7 @@ def build_connect_url(
     organization_id: uuid.UUID,
     user_id: uuid.UUID,
 ) -> str:
-    state = create_oauth_state(organization_id, user_id)
-    return build_authorization_url(state=state)
+    return build_authorization_url(organization_id=organization_id, user_id=user_id)
 
 
 async def handle_oauth_callback(
@@ -52,8 +50,8 @@ async def handle_oauth_callback(
     code: str,
     state: str,
 ) -> GoogleCalendarConnection:
-    organization_id, user_id = verify_oauth_state(state)
-    token_data = await exchange_code_for_tokens(code)
+    organization_id, user_id, code_verifier = verify_oauth_state(state)
+    token_data = await exchange_code_for_tokens(code, code_verifier=code_verifier)
     email = await fetch_google_email(token_data["access_token"])
     access_enc, refresh_enc = encrypt_tokens_for_storage(
         access_token=token_data["access_token"],

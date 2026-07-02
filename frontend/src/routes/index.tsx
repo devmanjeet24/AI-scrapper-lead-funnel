@@ -1,9 +1,14 @@
 import { Route, Routes } from 'react-router-dom'
 
+import { AppointmentsPage } from '@/routes/pages/AppointmentsPage'
 import { AuthPage } from '@/routes/pages/AuthPage'
 import { DashboardPage } from '@/routes/pages/DashboardPage'
 import { HomePage } from '@/routes/pages/HomePage'
 import { LeadsPage } from '@/routes/pages/LeadsPage'
+import { OutreachPage } from '@/routes/pages/OutreachPage'
+import { OutreachConversationPage } from '@/routes/pages/OutreachConversationPage'
+import { ScrapeJobsPage } from '@/routes/pages/ScrapeJobsPage'
+import { SettingsPage } from '@/routes/pages/SettingsPage'
 import { SignalsPage } from '@/routes/pages/SignalsPage'
 import { DashboardLayout } from '@/routes/layouts/DashboardLayout'
 import { RootLayout } from '@/routes/layouts/RootLayout'
@@ -27,9 +32,11 @@ export function AppRouter() {
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="leads" element={<LeadsPage />} />
             <Route path="signals" element={<SignalsPage />} />
-            <Route path="scrape-jobs" element={<RoutePlaceholder name="scrape-jobs" />} />
-            <Route path="appointments" element={<RoutePlaceholder name="appointments" />} />
-            <Route path="outreach" element={<RoutePlaceholder name="outreach" />} />
+            <Route path="scrape-jobs" element={<ScrapeJobsPage />} />
+            <Route path="appointments" element={<AppointmentsPage />} />
+            <Route path="outreach" element={<OutreachPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="outreach/conversations/:conversationId" element={<OutreachConversationPage />} />
           </Route>
         </Route>
 

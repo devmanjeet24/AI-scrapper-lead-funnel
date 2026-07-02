@@ -22,3 +22,13 @@ export interface DashboardStats {
   meetingsToday: number
   activeOutreach: number
 }
+
+export type DashboardActivityType = 'signal' | 'lead' | 'creative' | 'outreach' | 'meeting'
+
+export interface DashboardActivityEvent {
+  id: string
+  type: DashboardActivityType
+  label: string
+  detail: string
+  created_at: string
+}

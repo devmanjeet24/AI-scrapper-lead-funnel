@@ -1,11 +1,11 @@
-import type { LucideIcon } from 'lucide-react'
 import {
   Bot,
   CalendarCheck,
-  Mail,
+  Globe,
   Palette,
   Radio,
   Send,
+  Settings,
   Sparkles,
   Users,
 } from 'lucide-react'
@@ -25,73 +25,6 @@ export const PIPELINE_STAGE_DEFINITIONS = [
   { id: 'outreach', label: 'Outreach', icon: Send },
   { id: 'meetings', label: 'Meetings', icon: CalendarCheck },
 ] as const
-
-export type ActivityType =
-  | 'signal'
-  | 'lead'
-  | 'creative'
-  | 'outreach'
-  | 'meeting'
-
-export interface ActivityEvent {
-  id: string
-  type: ActivityType
-  label: string
-  detail: string
-  time: string
-  icon: LucideIcon
-}
-
-export const ACTIVITY_POOL: Omit<ActivityEvent, 'id' | 'time'>[] = [
-  {
-    type: 'signal',
-    label: 'Signal detected',
-    detail: 'Series B funding at NovaTech',
-    icon: Radio,
-  },
-  {
-    type: 'lead',
-    label: 'Lead qualified',
-    detail: 'VP Sales — 94% ICP match',
-    icon: Users,
-  },
-  {
-    type: 'creative',
-    label: 'Creative generated',
-    detail: 'Personalized email for Growth Labs',
-    icon: Sparkles,
-  },
-  {
-    type: 'outreach',
-    label: 'Outreach started',
-    detail: 'Multi-channel sequence #24',
-    icon: Mail,
-  },
-  {
-    type: 'meeting',
-    label: 'Meeting booked',
-    detail: 'Demo with CloudSync — Thu 2pm',
-    icon: CalendarCheck,
-  },
-  {
-    type: 'signal',
-    label: 'Signal detected',
-    detail: 'VP Sales role posted at Apex AI',
-    icon: Radio,
-  },
-  {
-    type: 'creative',
-    label: 'Creative generated',
-    detail: 'LinkedIn DM variant for Marcus Webb',
-    icon: Palette,
-  },
-  {
-    type: 'outreach',
-    label: 'Outreach started',
-    detail: 'Follow-up wave — 18 contacts',
-    icon: Send,
-  },
-]
 
 export const AI_AGENTS = [
   {
@@ -134,8 +67,10 @@ export const AI_AGENTS = [
 
 export const SIDEBAR_NAV = [
   { label: 'Mission Control', href: '/dashboard', icon: Sparkles, active: true },
+  { label: 'Scrape Jobs', href: '/scrape-jobs', icon: Globe },
   { label: 'Signals', href: '/signals', icon: Radio },
   { label: 'Leads', href: '/leads', icon: Users },
   { label: 'Outreach', href: '/outreach', icon: Send },
   { label: 'Appointments', href: '/appointments', icon: CalendarCheck },
+  { label: 'Settings', href: '/settings', icon: Settings },
 ] as const
