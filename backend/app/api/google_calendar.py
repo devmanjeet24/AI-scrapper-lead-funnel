@@ -1,14 +1,16 @@
 import uuid
+from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
 from app.auth.dependencies import get_current_user
+from app.core.config import settings
 from app.db.dependencies import get_db
 from app.models.enums import GoogleCalendarConnectionStatus
 from app.models.user import User
 from app.schemas.appointment import (
-    GoogleCalendarCallbackResponse,
     GoogleCalendarConnectResponse,
     GoogleCalendarStatusResponse,
 )
@@ -22,6 +24,18 @@ from app.services.google_calendar_connection_service import (
 from app.services.google_oauth_service import GoogleOAuthError, GoogleOAuthNotConfiguredError
 
 router = APIRouter(tags=["google-calendar"])
+
+
+def _calendar_callback_redirect(*, success: bool, email: str | None = None, message: str | None = None):
+    params: dict[str, str] = {"calendar": "connected" if success else "error"}
+    if email:
+        params["email"] = email
+    if message:
+        params["message"] = message
+    return RedirectResponse(
+        url=f"{settings.frontend_url.rstrip('/')}/appointments?{urlencode(params)}",
+        status_code=status.HTTP_302_FOUND,
+    )
 
 
 @router.get(
@@ -43,23 +57,25 @@ def google_calendar_connect_endpoint(
 
 @router.get("/integrations/google-calendar/callback")
 async def google_calendar_callback_endpoint(
-    code: str = Query(...),
-    state: str = Query(...),
+    code: str | None = Query(default=None),
+    state: str | None = Query(default=None),
+    error: str | None = Query(default=None),
     db: Session = Depends(get_db),
 ):
+    if error:
+        return _calendar_callback_redirect(success=False, message=error)
+
+    if not code or not state:
+        return _calendar_callback_redirect(
+            success=False,
+            message="Missing authorization code or state",
+        )
+
     try:
         connection = await handle_oauth_callback(db, code=code, state=state)
-        return GoogleCalendarCallbackResponse(
-            connected=True,
-            google_email=connection.google_email,
-            calendar_id=connection.calendar_id,
-            message="Google Calendar connected successfully",
-        )
+        return _calendar_callback_redirect(success=True, email=connection.google_email)
     except (GoogleOAuthError, GoogleCalendarConnectionError) as exc:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(exc),
-        ) from None
+        return _calendar_callback_redirect(success=False, message=str(exc))
 
 
 @router.get(

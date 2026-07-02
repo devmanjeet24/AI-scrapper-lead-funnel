@@ -5,11 +5,18 @@ Channels fall back to internal (in-app) delivery when external APIs are not conf
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from typing import Any, Protocol
 
+import httpx
+
 from app.core.config import settings
 from app.models.enums import OutreachChannel
+
+logger = logging.getLogger(__name__)
+
+RESEND_API_URL = "https://api.resend.com/emails"
 
 
 @dataclass
@@ -63,25 +70,73 @@ class EmailChannelAdapter:
         recipient_email: str | None,
         recipient_phone: str | None,
     ) -> DeliveryResult:
-        if settings.resend_api_key and recipient_email:
+        # Graceful fallback: keep existing behaviour when the provider is not set up.
+        if not settings.resend_api_key or not recipient_email:
+            return DeliveryResult(
+                delivered=True,
+                mode="internal_fallback",
+                metadata={
+                    "message": (
+                        "Email channel requested but RESEND_API_KEY not configured "
+                        "(or no recipient email). Message stored in conversation thread."
+                    ),
+                    "fallback_from": self.channel.value,
+                },
+            )
+
+        payload: dict[str, Any] = {
+            "from": settings.resend_from_email,
+            "to": [recipient_email],
+            "subject": subject or "Message from our team",
+            "text": content,
+        }
+        if settings.resend_reply_to:
+            payload["reply_to"] = settings.resend_reply_to
+
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(
+                    RESEND_API_URL,
+                    headers={"Authorization": f"Bearer {settings.resend_api_key}"},
+                    json=payload,
+                )
+        except httpx.HTTPError as exc:
+            logger.warning("Resend request failed: %s", exc)
             return DeliveryResult(
                 delivered=False,
-                mode="resend_stub",
+                mode="resend_error",
                 metadata={
-                    "message": "Resend integration stub — wire RESEND_API_KEY to enable sending.",
+                    "message": "Failed to reach Resend API. Message stored in conversation thread.",
+                    "error": str(exc),
                     "recipient": recipient_email,
                     "subject": subject,
                 },
             )
+
+        if response.is_success:
+            data = response.json()
+            return DeliveryResult(
+                delivered=True,
+                mode="resend",
+                metadata={
+                    "message": "Email sent via Resend.",
+                    "provider": "resend",
+                    "provider_message_id": data.get("id"),
+                    "recipient": recipient_email,
+                    "from": settings.resend_from_email,
+                    "subject": subject,
+                },
+            )
+
         return DeliveryResult(
-            delivered=True,
-            mode="internal_fallback",
+            delivered=False,
+            mode="resend_error",
             metadata={
-                "message": (
-                    "Email channel requested but RESEND_API_KEY not configured. "
-                    "Message stored in conversation thread."
-                ),
-                "fallback_from": self.channel.value,
+                "message": "Resend rejected the email. Message stored in conversation thread.",
+                "error": response.text,
+                "status_code": response.status_code,
+                "recipient": recipient_email,
+                "subject": subject,
             },
         )
 

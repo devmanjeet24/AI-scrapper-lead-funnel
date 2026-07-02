@@ -24,6 +24,7 @@ from app.services.outreach_service import (
     OutreachConversationNotFoundError,
     add_lead_reply,
     get_outreach_campaign,
+    get_outreach_conversation,
     list_conversations_for_campaign,
     list_messages_for_conversation,
     list_outreach_campaigns,
@@ -158,6 +159,24 @@ def list_campaign_conversations_endpoint(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Outreach campaign not found",
         ) from None
+
+
+@router.get(
+    "/outreach-conversations/{conversation_id}",
+    response_model=OutreachConversationResponse,
+)
+def get_outreach_conversation_endpoint(
+    conversation_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    conversation = get_outreach_conversation(db, current_user.organization_id, conversation_id)
+    if conversation is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Outreach conversation not found",
+        )
+    return conversation
 
 
 @router.get(
